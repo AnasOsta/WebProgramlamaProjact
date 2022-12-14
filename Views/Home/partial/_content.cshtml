@@ -1,0 +1,69 @@
+﻿@model v6.Models.Content
+<div class="portfolio-modal modal fade" id="content" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="modal-body">
+                            <h4>Content</h4>
+                            <hr />
+                            <div class="row">
+                                <div>
+                                    <form asp-action="Index">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <div class="form-group ">
+                                            <label asp-for="kullaniciId" class="control-label">Kullanıcı NO </label>
+                                            <input asp-for="kullaniciId" class="form-control" value="12" disabled />
+                                            <span asp-validation-for="kullaniciId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="adi" class="control-label">İçerik Adı</label>
+                                            <input asp-for="adi" class="form-control" />
+                                            <span asp-validation-for="adi" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="imageUrl" class="control-label">Fotoğraf URL</label>
+                                            <input asp-for="imageUrl" class="form-control" />
+                                            <span asp-validation-for="imageUrl" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="tur" class="control-label">İçerik Tür</label>
+                                            <input asp-for="tur" class="form-control" />
+                                            <span asp-validation-for="tur" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="balslik" class="control-label">İçerik Başlık</label>
+                                            <input asp-for="balslik" class="form-control" />
+                                            <span asp-validation-for="balslik" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="content" class="control-label">İçerik</label>
+                                            <input asp-for="content" class="form-control" />
+                                            <span asp-validation-for="content" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" value="Ekle" class="btn btn-primary btn-xl text-uppercase" />
+                                        </div>
+                                    </form>
+                                    <button class="btn btn-primary btn-xl text-uppercase bg-danger" data-bs-dismiss="modal" type="button">
+                                        <i class="fas fa-xmark me-1"></i>
+                                        kapat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
