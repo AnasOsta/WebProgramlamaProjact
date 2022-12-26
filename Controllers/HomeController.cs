@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,59 +14,107 @@ using v6.Models;
 
 namespace v6.Controllers
 {
+
     public class HomeController : Controller
     {
-        NpgsqlConnection con = new NpgsqlConnection("Server=127.0.0.1;User Id=anas;Password=741520;Database=WebProgramlama;");
-        private NpgsqlCommand cmd;
+
+        KullaniciContext k = new KullaniciContext();
+        Kullanici kullaniciSave;
 
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IStringLocalizer<HomeController> _localizer;
+        public HomeController(ILogger<HomeController> logger, IStringLocalizer<HomeController> localizer)
         {
+            _localizer = localizer;
             _logger = logger;
+        }
+        void getContent()
+        {
+           var aa = (from item in k.Contentlar
+                     select item).ToList();
+            for (int i = 0; i < aa.Count; i++)
+            {
+                var aa2 = (from item in k.Kullanicilar
+                           where item.KullaniciID == aa[i].KullaniciID
+                           select item).First();
+                aa[i].Kullanici = aa2;
+            }
+            ViewBag.Data = aa;
         }
         [HttpGet]
         public IActionResult Index()
         {
+            getContent();
             return View();
         }
         [HttpPost]
         public IActionResult KullaniciEkle(Kullanici k)
         {
-            con.Open();
-            string sql = "INSERT INTO kullanici(adi, soyadi, mail, sifre, dogumtarihi, admin) VALUES(@adi, @soyadi, @mail, @sifre, @dogumtarihi, @admin)";
-            try
+            if (ModelState.IsValid)
             {
-                //insert into kullanici Start
-                cmd = new NpgsqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("adi", k.KullaniciAd);
-                cmd.Parameters.AddWithValue("soyadi", k.KullaniciSoyad);
-                cmd.Parameters.AddWithValue("mail", k.mail);
-                cmd.Parameters.AddWithValue("sifre", k.sifre);
-                cmd.Parameters.AddWithValue("dogumtarihi", k.DogumTarihi);
-                cmd.Parameters.AddWithValue("admin", false);
-                cmd.Prepare();
-                cmd.ExecuteNonQuery();
-                //insert into kullanici End
-                con.Close();
-                return View();
+                this.k.Add(k);
+                this.k.SaveChanges();
+                Response.WriteAsync("<script>alert('Basariyla yeni kullanici ekledi');window.location = 'Index';</script>");
+                return RedirectToAction("Index");
             }
-            catch (Exception e)
+            else
             {
-                con.Close();
-                return View("Error");
+                TempData["hata"] = "Lütfen Gerekli alanları doldurunuz";
+                return RedirectToAction("Index");
             }
         }
-        [HttpPost]
-        public IActionResult Login(Login l)
+        public IActionResult Logout()
         {
-            con.Open();
-            string sql = "SELECT mail FROM kullanici";
-            cmd = new NpgsqlCommand(sql, con);
-            DataTable dt = new DataTable();
-            dt.Load(cmd.ExecuteReader());
-            con.Close();
-            return View(dt.Rows);
+            HttpContext.Response.Cookies.Delete("Login");
+            HttpContext.Response.Cookies.Delete("Admin");
+            HttpContext.Response.Cookies.Delete("KullaniciAd");
+            HttpContext.Response.Cookies.Delete("KullaniciSoyad");
+            HttpContext.Response.Cookies.Delete("KullaniciID");
+            HttpContext.Response.Cookies.Delete("mail");
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login(Login l)
+        {
+            if (ModelState.IsValid)
+            {
+                var aa = await k.Kullanicilar
+                .FirstOrDefaultAsync(m => m.KullaniciAd == l.KullaniciAd);
+
+                if (aa != null) {
+                    kullaniciSave = aa;
+                    HttpContext.Response.Cookies.Append("Login", l.KullaniciAd); 
+                    HttpContext.Response.Cookies.Append("Admin", aa.admin.ToString());
+                    HttpContext.Response.Cookies.Append("KullaniciAd", aa.KullaniciAd.ToString()); 
+                    HttpContext.Response.Cookies.Append("KullaniciSoyad", aa.KullaniciSoyad.ToString()); 
+                    HttpContext.Response.Cookies.Append("KullaniciID", aa.KullaniciID.ToString()); 
+                    HttpContext.Response.Cookies.Append("mail", aa.mail.ToString()); 
+                }
+                else Response.WriteAsync("<script>alert('Kullanici adi yada sifre yanlis');window.location = 'Index';</script>");
+
+            }
+            else
+            {
+                TempData["hata"] = "Lütfen Gerekli alanları doldurunuz";
+            }
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult content(Content c)
+        {
+            if (ModelState.IsValid)
+            {
+                c.KullaniciID = int.Parse(HttpContext.Request.Cookies["KullaniciID"]);
+                this.k.Add(c);
+                this.k.SaveChanges();
+                Response.WriteAsync("<script>alert('Basariyla yeni içerik ekeldi');window.location = 'Index';</script>");
+                return View("Index");
+            }
+            else
+            {
+                TempData["hata"] = "Lütfen Gerekli alanları doldurunuz";
+                return RedirectToAction("Index");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
