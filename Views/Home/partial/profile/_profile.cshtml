@@ -1,0 +1,43 @@
+﻿@{
+    var kullaniciAd = Context.Request.Cookies["KullaniciAd"];
+    var kullaniciSoyad = Context.Request.Cookies["KullaniciSoyad"];
+    var kullaniciID = Context.Request.Cookies["KullaniciID"];
+    var mail = Context.Request.Cookies["mail"];
+    var sifre = "**********";
+}
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+<div class="portfolio-modal modal fade" id="Profile" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="close-modal" data-bs-dismiss="modal"></div>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="modal-body">
+
+                            <div>@kullaniciAd</div>
+                            <hr />
+                            <div>@Localizer["Kullainci ID"] : @kullaniciID</div>
+                            <div>@Localizer["Kullainci Adi"] : @kullaniciAd</div>
+                            <div>@Localizer["Kullainci Soyadi"] : @kullaniciSoyad</div>
+                            <div>@Localizer["Kullainci Mail"] : @mail</div>
+                            <div>@Localizer["Kullainci Sifre"] : @sifre</div>
+                            <form asp-action="Logout">
+                                <div class="form-group">
+                                    <input type="submit" value="@Localizer["Logout"]" class="btn btn-primary btn-xl text-uppercase bg-danger" />
+                                </div>
+                            </form>
+                            <partial name="~/Views/Home/partial/close/_close.cshtml" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

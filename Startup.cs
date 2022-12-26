@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,10 +28,27 @@ namespace v6
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-        }
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
+            services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat
+                 .Suffix).AddDataAnnotationsLocalization();
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[]
+                {
+                    new CultureInfo("tr"),
+                    new CultureInfo("en"),
+                    new CultureInfo("ar"),
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+                };
+                options.DefaultRequestCulture = new RequestCulture(culture: "tr", uiCulture: "tr");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
+        } 
+            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -43,10 +64,13 @@ namespace v6
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
+            var locOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+                app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",

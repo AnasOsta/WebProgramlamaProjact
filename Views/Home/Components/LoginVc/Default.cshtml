@@ -1,5 +1,12 @@
 ﻿@model v6.Models.Login
 
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
 
 <div class="portfolio-modal modal fade" id="Login" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
@@ -10,11 +17,11 @@
                     <div class="col-lg-8">
                         <div class="modal-body">
                             <!-- Project details-->
-                            <h1 class="text-uppercase">giriş yap</h1>
+                            <h1 class="text-uppercase">ْ@Localizer["Login"]</h1>
                             <hr />
                             <div class="row">
                                 <div>
-                                    <form asp-action="Login" >
+                                    <form asp-action="Login">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <div class="form-group">
                                             <label asp-for="KullaniciAd" class="control-label"></label>
@@ -27,16 +34,14 @@
                                             <span asp-validation-for="sifre" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
-                                            <input type="submit" value="giriş yap" class="btn btn-primary text-uppercase btn-xl" />
+                                            <input type="submit" value="@Localizer["Login"]" class="btn btn-primary text-uppercase btn-xl" />
                                         </div>
                                     </form>
-                                    <button class="btn btn-primary btn-xl text-uppercase bg-danger" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        kapat
-                                    </button>
+                                    <partial name="~/Views/Home/partial/close/_close.cshtml" />
                                 </div>
                             </div>
-    `                   </div>
+                            `
+                        </div>
                     </div>
                 </div>
             </div>

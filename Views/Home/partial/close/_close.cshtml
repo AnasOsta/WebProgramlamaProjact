@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+<button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
+    <i class="fas fa-xmark me-1"></i>
+    @Localizer["close"]
+</button>

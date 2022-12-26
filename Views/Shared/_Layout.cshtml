@@ -1,4 +1,21 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Http;
+
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
+        .ToList();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -13,18 +30,36 @@
             <div class="container">
                 <a class="navbar-brand" href="#page-top">Anas Osta</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
+                    @Localizer["menu"]
                     <i class="fas fa-bars ms-1"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#team">Takım</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#KullaniciEkle"><h5>Yeni Kullanici</h5></a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#Login"><h5>Giriş Yap</h5></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#services">@Localizer["Services"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#portfolio">@Localizer["Portfolio"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#about">@Localizer["About"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#team">@Localizer["Team"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contact">@Localizer["Contact"]</a></li>
+                        <li class="nav-item">
+                            <select style="width: 90px" onchange="SetCulture(this.value)" asp-for="@requestCulture.RequestCulture.UICulture.Name" asp-items="cultureItems">
+                            </select>
+                        </li>
+                        @if (@Context.Request.Cookies["Login"] == null)
+                        {
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#KullaniciEkle"><h5>@Localizer["signup"]</h5></a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#Login"><h5>@Localizer["login"]</h5></a></li>
+                        }
+                        else
+                        {
+                            if (Context.Request.Cookies["Admin"] != "True")
+                            {
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#Profile"><h5>@Context.Request.Cookies["Login"]</h5></a></li>
+                            }
+                            else
+                            {
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" href="#Admin"><h5>@Context.Request.Cookies["Login"]</h5></a></li>
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -52,6 +87,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    
+
 </body>
 </html>
