@@ -38,5 +38,7 @@ namespace v6.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime DogumTarihi { get; set; }
+        public bool admin { get; set; }
+        public ICollection<Content> Contents { get; set; }
     }
 }

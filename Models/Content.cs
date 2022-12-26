@@ -9,8 +9,7 @@ namespace v6.Models
     public class Content
     {
         [Key]
-        int Id { get; set; }
-        public int kullaniciId { get; set; }
+        public int ContentID { get; set; }
         [Required(ErrorMessage = "Bu alan zorunlu")]
         public string adi { get; set; }
         [Required(ErrorMessage = "Bu alan zorunlu")]
@@ -21,6 +20,7 @@ namespace v6.Models
         public string balslik { get; set; }
         [Required(ErrorMessage = "Bu alan zorunlu")]
         public string content { get; set; }
-
+        public int KullaniciID { get; set; }
+        public Kullanici Kullanici { get; set; }
     }
 }
